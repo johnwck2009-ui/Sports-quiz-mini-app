@@ -19,7 +19,7 @@ COINS_PER_CORRECT = 10
 balances = {}
 sessions = {}
 
-QUESTIONS = {
+EASY_QUESTIONS = {
     "football": [
         {"q": "How many players from one team are on the pitch at kick-off in football?", "options": ["9", "10", "11", "12"], "answer": 2},
         {"q": "What is it called when a player scores three goals in one match?", "options": ["Hat-trick", "Triple play", "Treble kick", "Three-pointer"], "answer": 0},
@@ -49,6 +49,73 @@ QUESTIONS = {
         {"q": "Which country hosts the famous Monaco Grand Prix?", "options": ["France", "Monaco", "Italy", "Spain"], "answer": 1}
     ]
 }
+
+# Each difficulty has its own questions. Rewards are chosen on the server.
+QUESTIONS = {
+    "easy": EASY_QUESTIONS,
+    "medium": {
+        "football": [
+            {"q": "Which country won UEFA Euro 2020, played in 2021?", "options": ["England", "Italy", "Spain", "Portugal"], "answer": 1},
+            {"q": "What is the term for three consecutive goals by one team without the opponent scoring between them?", "options": ["Clean sweep", "Perfect hat-trick", "Brace", "Shutout"], "answer": 1},
+            {"q": "How far is the penalty spot from the goal line?", "options": ["9 yards", "10 yards", "12 yards", "15 yards"], "answer": 2},
+            {"q": "Which club plays its home matches at Anfield?", "options": ["Everton", "Liverpool", "Manchester City", "Chelsea"], "answer": 1},
+            {"q": "How many teams compete in the group stage of the men's FIFA World Cup from 2026 onward?", "options": ["32", "36", "40", "48"], "answer": 3}
+        ],
+        "basketball": [
+            {"q": "How long is an NBA quarter?", "options": ["10 minutes", "12 minutes", "15 minutes", "20 minutes"], "answer": 1},
+            {"q": "How many personal fouls disqualify a player in an NBA game?", "options": ["4", "5", "6", "7"], "answer": 2},
+            {"q": "What is a triple-double?", "options": ["Three made three-pointers", "Double digits in three statistical categories", "Three consecutive baskets", "A score tied three times"], "answer": 1},
+            {"q": "Which position typically brings the ball up the court and directs the offense?", "options": ["Center", "Point guard", "Power forward", "Small forward"], "answer": 1},
+            {"q": "How many seconds does an NBA team normally have to attempt a shot?", "options": ["14", "20", "24", "30"], "answer": 2}
+        ],
+        "tennis": [
+            {"q": "In a standard tiebreak, what is the usual minimum points needed to win with a two-point lead?", "options": ["5", "6", "7", "10"], "answer": 2},
+            {"q": "Which Grand Slam tournament is played on clay?", "options": ["Australian Open", "French Open", "Wimbledon", "US Open"], "answer": 1},
+            {"q": "What is a serve called when the receiver cannot touch it?", "options": ["Let", "Ace", "Volley", "Lob"], "answer": 1},
+            {"q": "In doubles, how many players are on court in total?", "options": ["2", "3", "4", "6"], "answer": 2},
+            {"q": "What does 'break serve' mean?", "options": ["Win a game while receiving", "Take a medical timeout", "Win a tiebreak", "Change ends"], "answer": 0}
+        ],
+        "formula1": [
+            {"q": "What does DRS help a driver do?", "options": ["Save fuel in the pit lane", "Reduce aerodynamic drag to aid overtaking", "Warm the tyres", "Communicate with race control"], "answer": 1},
+            {"q": "What colour flag is commonly used to warn a driver of danger ahead?", "options": ["Blue", "Yellow", "Green", "White"], "answer": 1},
+            {"q": "What is a formation lap mainly used for before a race start?", "options": ["Awarding points", "Preparing tyres and checking the car", "Changing the grid order freely", "Refuelling every car"], "answer": 1},
+            {"q": "Which tyre compound is generally marked with a white sidewall in dry F1 races?", "options": ["Soft", "Medium", "Hard", "Intermediate"], "answer": 2},
+            {"q": "What is parc fermé?", "options": ["A restricted area where cars are subject to rules and checks", "The driver parade", "The pit crew garage only", "The post-race podium"], "answer": 0}
+        ]
+    },
+    "hard": {
+        "football": [
+            {"q": "Which nation won the first FIFA World Cup in 1930?", "options": ["Brazil", "Italy", "Uruguay", "Argentina"], "answer": 2},
+            {"q": "Which club won the first edition of the European Cup in 1956?", "options": ["Real Madrid", "AC Milan", "Benfica", "Barcelona"], "answer": 0},
+            {"q": "Under the standard Laws of the Game, what is the minimum number of players a team must have to continue a match?", "options": ["6", "7", "8", "9"], "answer": 1},
+            {"q": "Which country hosted the 1998 FIFA World Cup?", "options": ["Germany", "Spain", "France", "Mexico"], "answer": 2},
+            {"q": "What is the name of the annual award traditionally presented to the world's best men's football player by France Football?", "options": ["The Golden Boot", "The Ballon d'Or", "The Golden Glove", "The Puskás Award"], "answer": 1}
+        ],
+        "basketball": [
+            {"q": "How far is the NBA three-point line at the top of the arc?", "options": ["21 ft 9 in", "22 ft", "23 ft 9 in", "25 ft"], "answer": 2},
+            {"q": "Which team drafted Kobe Bryant before trading him to the Los Angeles Lakers in 1996?", "options": ["Charlotte Hornets", "Philadelphia 76ers", "New Jersey Nets", "Boston Celtics"], "answer": 0},
+            {"q": "How many seconds does a player have to inbound the ball in the NBA?", "options": ["3", "5", "8", "10"], "answer": 1},
+            {"q": "Which statistic records a player's pass directly leading to a made basket?", "options": ["Rebound", "Assist", "Steal", "Block"], "answer": 1},
+            {"q": "What violation occurs when an offensive player stays in the key too long under NBA rules?", "options": ["Backcourt violation", "Three-second violation", "Double dribble", "Traveling"], "answer": 1}
+        ],
+        "tennis": [
+            {"q": "Which player completed the calendar-year Grand Slam in men's singles in 1969?", "options": ["Rod Laver", "Ken Rosewall", "Roy Emerson", "Björn Borg"], "answer": 0},
+            {"q": "In tennis scoring, what does 'ad-in' mean after deuce?", "options": ["Receiver has advantage", "Server has advantage", "The point is replayed", "The game is over"], "answer": 1},
+            {"q": "Which Grand Slam moved to a hard court in 1988 after being played on grass?", "options": ["French Open", "Wimbledon", "Australian Open", "US Open"], "answer": 2},
+            {"q": "What is the maximum number of sets in a men's singles match at most Grand Slam events today?", "options": ["3", "4", "5", "7"], "answer": 2},
+            {"q": "Which shot is hit before the ball bounces on the player's side?", "options": ["Lob", "Volley", "Drop shot", "Passing shot"], "answer": 1}
+        ],
+        "formula1": [
+            {"q": "Who became Formula 1's first World Drivers' Champion in 1950?", "options": ["Juan Manuel Fangio", "Alberto Ascari", "Giuseppe Farina", "Stirling Moss"], "answer": 2},
+            {"q": "Which circuit is known for its Eau Rouge–Raidillon sequence?", "options": ["Monza", "Spa-Francorchamps", "Silverstone", "Suzuka"], "answer": 1},
+            {"q": "How many points does a driver receive for winning a modern F1 Grand Prix, excluding sprint points?", "options": ["20", "25", "26", "30"], "answer": 1},
+            {"q": "What does a blue flag generally instruct a driver to do when being lapped?", "options": ["Stop immediately", "Allow a faster car to pass", "Return to the pits", "Change tyres"], "answer": 1},
+            {"q": "Which team did Michael Schumacher win his first two World Drivers' Championships with?", "options": ["Ferrari", "Benetton", "Jordan", "Mercedes"], "answer": 1}
+        ]
+    }
+}
+
+COINS_BY_DIFFICULTY = {"easy": 5, "medium": 15, "hard": 30}
 
 def telegram_api(method, payload=None):
     """Call Telegram's Bot API without requiring an extra package."""
@@ -156,13 +223,16 @@ def start_quiz():
         return jsonify({"error": "Telegram verification failed. Open this app from Telegram."}), 401
     data = request.get_json(silent=True) or {}
     sport = data.get("sport", "football")
-    if sport not in QUESTIONS:
+    difficulty = data.get("difficulty", "easy")
+    if sport not in EASY_QUESTIONS:
         return jsonify({"error": "Choose a supported sport."}), 400
-    sessions[user_id] = {"sport": sport, "index": 0, "correct": 0, "answered": []}
-    return jsonify({"question": public_question(sport, 0), "number": 1, "total": QUESTION_COUNT})
+    if difficulty not in QUESTIONS:
+        return jsonify({"error": "Choose a supported difficulty."}), 400
+    sessions[user_id] = {"sport": sport, "difficulty": difficulty, "index": 0, "correct": 0, "answered": []}
+    return jsonify({"question": public_question(sport, 0, difficulty), "number": 1, "total": QUESTION_COUNT, "difficulty": difficulty, "coinsPerCorrect": COINS_BY_DIFFICULTY[difficulty]})
 
-def public_question(sport, index):
-    item = QUESTIONS[sport][index]
+def public_question(sport, index, difficulty="easy"):
+    item = QUESTIONS[difficulty][sport][index]
     return {"question": item["q"], "options": item["options"]}
 
 @app.post("/api/answer")
@@ -179,9 +249,9 @@ def answer():
     choice = data.get("choice")
     if not isinstance(choice, int) or isinstance(choice, bool) or not 0 <= choice < 4:
         return jsonify({"error": "Select an answer."}), 400
-    item = QUESTIONS[session["sport"]][session["index"]]
+    item = QUESTIONS[session["difficulty"]][session["sport"]][session["index"]]
     correct = choice == item["answer"]
-    earned = COINS_PER_CORRECT if correct else 0
+    earned = COINS_BY_DIFFICULTY[session["difficulty"]] if correct else 0
     if correct:
         session["correct"] += 1
         balances[user_id] = balances.get(user_id, 0) + earned
@@ -197,7 +267,7 @@ def answer():
         "score": session["correct"]
     }
     if not result["finished"]:
-        result["question"] = public_question(session["sport"], session["index"])
+        result["question"] = public_question(session["sport"], session["index"], session["difficulty"])
     return jsonify(result)
 
 @app.get("/api/sports")
