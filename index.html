@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#101827">
+  <title>Sports Quiz Arena</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+  <style>
+    :root{color-scheme:dark;--bg:#101827;--panel:#192538;--panel2:#22324a;--text:#f5f7fb;--muted:#9eacc1;--lime:#c8f169;--blue:#8fc8ff;--danger:#ff8b8b}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#20334d 0,#101827 55%);font-family:Inter,ui-sans-serif,system-ui,-apple-system,sans-serif;color:var(--text);min-height:100vh}
+    main{max-width:560px;margin:0 auto;padding:calc(22px + env(safe-area-inset-top)) 18px calc(30px + env(safe-area-inset-bottom))}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-size:12px;letter-spacing:2px;color:var(--muted);font-weight:800}.coins{background:#293c2b;border:1px solid #476341;border-radius:999px;padding:9px 13px;font-weight:800;color:var(--lime);white-space:nowrap}
+    h1{font-size:clamp(32px,9vw,46px);line-height:1.02;letter-spacing:-1.8px;margin:28px 0 12px}.accent{color:var(--lime)}.sub{color:var(--muted);line-height:1.55;margin:0 0 22px}
+    .panel{background:rgba(25,37,56,.94);border:1px solid #2c3d55;border-radius:22px;padding:20px;margin-top:16px;box-shadow:0 16px 50px #0002}
+    .section-title{font-size:14px;color:var(--muted);font-weight:700;margin:0 0 12px}.sports{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    button{font:inherit;cursor:pointer;border:0}.sport{background:var(--panel2);color:var(--text);border:1px solid #354963;border-radius:16px;padding:16px 12px;text-align:left;min-height:95px}.sport .emoji{font-size:25px;display:block;margin-bottom:9px}.sport strong{font-size:14px}.sport.selected{border:2px solid var(--lime);background:#2a3b35}
+    .primary{width:100%;border-radius:14px;padding:16px;background:var(--lime);color:#142014;font-weight:900;margin-top:18px}.primary:disabled{opacity:.5;cursor:wait}
+    .hidden{display:none!important}.eyebrow{font-size:12px;letter-spacing:1.5px;color:var(--lime);font-weight:900;text-transform:uppercase}.question{font-size:23px;line-height:1.25;margin:13px 0 20px}.progress-row{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-bottom:9px}.track{height:6px;background:#34445a;border-radius:20px;overflow:hidden}.fill{height:100%;background:var(--lime);width:20%;transition:width .2s}
+    .answers{display:grid;gap:10px}.answer{padding:15px;text-align:left;background:var(--panel2);border:1px solid #354963;color:var(--text);border-radius:13px;min-height:54px}.answer:disabled{opacity:1}.answer.good{border-color:#9cd95a;background:#263b2b}.answer.bad{border-color:#d96b6b;background:#40282e}
+    .feedback{margin-top:14px;font-size:14px;color:var(--muted);line-height:1.45;min-height:20px}.big-score{font-size:56px;font-weight:900;letter-spacing:-2px;margin:14px 0}.small{font-size:13px;color:var(--muted);line-height:1.6}.notice{padding:12px 14px;border-radius:12px;background:#263449;color:var(--muted);font-size:12px;line-height:1.5;margin-top:16px}
+    footer{text-align:center;color:#718199;font-size:11px;margin-top:22px}
+  </style>
+</head>
+<body>
+<main>
+  <div class="top"><div class="brand">SPORTS QUIZ ARENA</div><div class="coins">🪙 <span id="coins">0</span> coins</div></div>
+  <section id="home">
+    <h1>Know your<br><span class="accent">sports?</span></h1>
+    <p class="sub">Pick your game. Prove what you know. Earn <strong>10 coins</strong> for every correct answer.</p>
+    <div class="panel">
+      <p class="section-title">CHOOSE YOUR SPORT</p>
+      <div class="sports" id="sports">
+        <button class="sport selected" data-sport="football"><span class="emoji">⚽</span><strong>Football</strong></button>
+        <button class="sport" data-sport="basketball"><span class="emoji">🏀</span><strong>Basketball</strong></button>
+        <button class="sport" data-sport="tennis"><span class="emoji">🎾</span><strong>Tennis</strong></button>
+        <button class="sport" data-sport="formula1"><span class="emoji">🏎️</span><strong>Formula 1</strong></button>
+      </div>
+      <button class="primary" id="start">START QUIZ →</button>
+    </div>
+    <div class="notice">Five questions per round. Your answers are checked by the server, not just by the screen.</div>
+  </section>
+  <section id="quiz" class="hidden">
+    <div class="panel">
+      <div class="progress-row"><span id="counter">QUESTION 1 OF 5</span><span id="live-score">0 correct</span></div>
+      <div class="track"><div class="fill" id="progress"></div></div>
+      <div class="eyebrow" id="sport-label">FOOTBALL</div>
+      <h2 class="question" id="question">Loading question…</h2>
+      <div class="answers" id="answers"></div>
+      <div class="feedback" id="feedback" aria-live="polite"></div>
+      <button class="primary hidden" id="next">NEXT QUESTION →</button>
+    </div>
+    <button class="primary" id="quit" style="background:#293950;color:white">QUIT TO HOME</button>
+  </section>
+  <section id="result" class="hidden">
+    <div class="panel">
+      <div class="eyebrow">ROUND COMPLETE</div>
+      <h2 class="question">Nice game!</h2>
+      <div class="big-score" id="final-score">0/5</div>
+      <p class="sub" id="result-copy">You earned 0 coins this round.</p>
+      <button class="primary" id="again">PLAY AGAIN →</button>
+      <button class="primary" id="home-button" style="background:#293950;color:white">CHOOSE ANOTHER SPORT</button>
+    </div>
+  </section>
+  <footer>PLAY FAIR · LEARN SPORTS · EARN COINS</footer>
+</main>
+<script>
+(() => {
+  const tg = window.Telegram?.WebApp;
+  tg?.ready();
+  tg?.expand();
+  const $ = id => document.getElementById(id);
+  let sport = "football", questionNumber = 1, correctCount = 0, roundCoins = 0, waiting = false;
+  const names = {football:"Football",basketball:"Basketball",tennis:"Tennis",formula1:"Formula 1"};
+  const headers = () => {
+    const h = {"Content-Type":"application/json"};
+    if (tg?.initData) h["X-Telegram-Init-Data"] = tg.initData;
+    else h["X-Demo-User"] = "browser-demo";
+    return h;
+  };
+  async function api(path, body) {
+    const res = await fetch(path, {method: body ? "POST" : "GET", headers: headers(), body: body ? JSON.stringify(body) : undefined});
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || "Something went wrong.");
+    return data;
+  }
+  function show(id) { ["home","quiz","result"].forEach(s => $(s).classList.toggle("hidden",s!==id)); }
+  function errorMessage(e) { alert(e.message || "Could not connect. Please try again."); }
+  async function refreshCoins() {
+    try { const data = await api("/api/me"); $("coins").textContent = data.coins; }
+    catch (_) { /* The page can still show the demo before setup. */ }
+  }
+  document.querySelectorAll(".sport").forEach(btn => btn.addEventListener("click", () => {
+    document.querySelectorAll(".sport").forEach(b=>b.classList.remove("selected"));
+    btn.classList.add("selected"); sport=btn.dataset.sport;
+  }));
+  function renderQuestion(data) {
+    $("counter").textContent = "QUESTION " + questionNumber + " OF 5";
+    $("progress").style.width = (questionNumber/5*100)+"%";
+    $("live-score").textContent = correctCount + " correct";
+    $("sport-label").textContent = names[sport].toUpperCase();
+    $("question").textContent = data.question;
+    $("feedback").textContent = "";
+    $("next").classList.add("hidden");
+    $("answers").innerHTML = "";
+    data.options.forEach((option,index) => {
+      const btn=document.createElement("button"); btn.className="answer"; btn.textContent=String.fromCharCode(65+index)+".  "+option;
+      btn.addEventListener("click",()=>submitAnswer(index)); $("answers").appendChild(btn);
+    });
+  }
+  async function startQuiz() {
+    $("start").disabled=true;
+    try {
+      const data=await api("/api/start",{sport});
+      questionNumber=1; correctCount=0; roundCoins=0; waiting=false;
+      renderQuestion(data.question); show("quiz");
+    } catch(e) { errorMessage(e); }
+    finally { $("start").disabled=false; }
+  }
+  async function submitAnswer(choice) {
+    if(waiting) return; waiting=true;
+    [...$("answers").children].forEach(b=>b.disabled=true);
+    try {
+      const data=await api("/api/answer",{choice});
+      if(data.correct) { correctCount++; roundCoins+=data.earned; }
+      $("live-score").textContent=correctCount+" correct";
+      [...$("answers").children].forEach((b,i)=>{
+        if(b.textContent.slice(4)===data.correctAnswer) b.classList.add("good");
+        else if(i===choice&&!data.correct) b.classList.add("bad");
+      });
+      $("feedback").textContent=data.correct ? "Correct! +"+data.earned+" coins 🪙" : "Not quite. Correct answer: "+data.correctAnswer;
+      $("coins").textContent=data.coins;
+      if(data.finished) {
+        $("next").textContent="SEE RESULTS →";
+        $("next").onclick=finishQuiz;
+      } else {
+        $("next").textContent="NEXT QUESTION →";
+        $("next").onclick=()=>{questionNumber++;renderQuestion(data.question);waiting=false;};
+      }
+      $("next").classList.remove("hidden");
+    } catch(e) { errorMessage(e); [...$("answers").children].forEach(b=>b.disabled=false); }
+    finally { waiting=false; }
+  }
+  async function finishQuiz() {
+    $("final-score").textContent=correctCount+"/5";
+    $("result-copy").textContent="You earned "+roundCoins+" coins this round. Keep going!";
+    show("result"); await refreshCoins();
+  }
+  $("start").addEventListener("click",startQuiz);
+  $("again").addEventListener("click",startQuiz);
+  $("home-button").addEventListener("click",()=>show("home"));
+  $("quit").addEventListener("click",()=>show("home"));
+  refreshCoins();
+})();
+</script>
+</body>
+</html>
