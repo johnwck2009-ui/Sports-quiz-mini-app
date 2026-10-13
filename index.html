@@ -13,7 +13,7 @@
     .top{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-size:12px;letter-spacing:2px;color:var(--muted);font-weight:800}.coins{background:#293c2b;border:1px solid #476341;border-radius:999px;padding:9px 13px;font-weight:800;color:var(--lime);white-space:nowrap}
     h1{font-size:clamp(32px,9vw,46px);line-height:1.02;letter-spacing:-1.8px;margin:28px 0 12px}.accent{color:var(--lime)}.sub{color:var(--muted);line-height:1.55;margin:0 0 22px}
     .panel{background:rgba(25,37,56,.94);border:1px solid #2c3d55;border-radius:22px;padding:20px;margin-top:16px;box-shadow:0 16px 50px #0002}
-    .section-title{font-size:14px;color:var(--muted);font-weight:700;margin:0 0 12px}.sports{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+    .section-title{font-size:14px;color:var(--muted);font-weight:700;margin:0 0 12px}.sports{display:grid;grid-template-columns:1fr 1fr;gap:10px}.difficulties{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.difficulty{background:var(--panel2);color:var(--text);border:1px solid #354963;border-radius:13px;padding:12px 5px;text-align:center}.difficulty strong{display:block;font-size:13px}.difficulty span{display:block;font-size:11px;color:var(--muted);margin-top:5px}.difficulty.selected{border:2px solid var(--lime);background:#2a3b35}.difficulty.selected span{color:#dce9cb}
     button{font:inherit;cursor:pointer;border:0}.sport{background:var(--panel2);color:var(--text);border:1px solid #354963;border-radius:16px;padding:16px 12px;text-align:left;min-height:95px}.sport .emoji{font-size:25px;display:block;margin-bottom:9px}.sport strong{font-size:14px}.sport.selected{border:2px solid var(--lime);background:#2a3b35}
     .primary{width:100%;border-radius:14px;padding:16px;background:var(--lime);color:#142014;font-weight:900;margin-top:18px}.primary:disabled{opacity:.5;cursor:wait}
     .hidden{display:none!important}.eyebrow{font-size:12px;letter-spacing:1.5px;color:var(--lime);font-weight:900;text-transform:uppercase}.question{font-size:23px;line-height:1.25;margin:13px 0 20px}.progress-row{display:flex;justify-content:space-between;color:var(--muted);font-size:12px;margin-bottom:9px}.track{height:6px;background:#34445a;border-radius:20px;overflow:hidden}.fill{height:100%;background:var(--lime);width:20%;transition:width .2s}
@@ -36,9 +36,15 @@
         <button class="sport" data-sport="tennis"><span class="emoji">🎾</span><strong>Tennis</strong></button>
         <button class="sport" data-sport="formula1"><span class="emoji">🏎️</span><strong>Formula 1</strong></button>
       </div>
+      <p class="section-title" style="margin-top:22px">CHOOSE DIFFICULTY</p>
+      <div class="difficulties" id="difficulties">
+        <button class="difficulty selected" data-difficulty="easy"><strong>Easy</strong><span>5 coins / answer</span></button>
+        <button class="difficulty" data-difficulty="medium"><strong>Medium</strong><span>15 coins / answer</span></button>
+        <button class="difficulty" data-difficulty="hard"><strong>Hard</strong><span>30 coins / answer</span></button>
+      </div>
       <button class="primary" id="start">START QUIZ →</button>
     </div>
-    <div class="notice">Five questions per round. Your answers are checked by the server, not just by the screen.</div>
+    <div class="notice">Five questions per round. Higher difficulty means tougher questions and bigger rewards. Your answers and rewards are checked by the server.</div>
   </section>
   <section id="quiz" class="hidden">
     <div class="panel">
@@ -70,7 +76,7 @@
   tg?.ready();
   tg?.expand();
   const $ = id => document.getElementById(id);
-  let sport = "football", questionNumber = 1, correctCount = 0, roundCoins = 0, waiting = false;
+  let sport = "football", difficulty = "easy", questionNumber = 1, correctCount = 0, roundCoins = 0, waiting = false;
   const names = {football:"Football",basketball:"Basketball",tennis:"Tennis",formula1:"Formula 1"};
   const headers = () => {
     const h = {"Content-Type":"application/json"};
@@ -94,11 +100,15 @@
     document.querySelectorAll(".sport").forEach(b=>b.classList.remove("selected"));
     btn.classList.add("selected"); sport=btn.dataset.sport;
   }));
+  document.querySelectorAll(".difficulty").forEach(btn => btn.addEventListener("click", () => {
+    document.querySelectorAll(".difficulty").forEach(b => b.classList.remove("selected"));
+    btn.classList.add("selected"); difficulty = btn.dataset.difficulty;
+  }));
   function renderQuestion(data) {
     $("counter").textContent = "QUESTION " + questionNumber + " OF 5";
     $("progress").style.width = (questionNumber/5*100)+"%";
     $("live-score").textContent = correctCount + " correct";
-    $("sport-label").textContent = names[sport].toUpperCase();
+    $("sport-label").textContent = names[sport].toUpperCase() + " · " + difficulty.toUpperCase();
     $("question").textContent = data.question;
     $("feedback").textContent = "";
     $("next").classList.add("hidden");
@@ -111,7 +121,7 @@
   async function startQuiz() {
     $("start").disabled=true;
     try {
-      const data=await api("/api/start",{sport});
+      const data=await api("/api/start",{sport,difficulty});
       questionNumber=1; correctCount=0; roundCoins=0; waiting=false;
       renderQuestion(data.question); show("quiz");
     } catch(e) { errorMessage(e); }
