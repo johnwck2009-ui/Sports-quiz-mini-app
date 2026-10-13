@@ -134,7 +134,7 @@ def telegram_api(method, payload=None):
 def send_start_message(chat_id):
     telegram_api("sendMessage", {
         "chat_id": chat_id,
-        "text": "🏆 Welcome to Sports Quiz!\n\nChoose a sport, answer questions, and earn 10 coins for every correct answer.",
+        "text": "🏆 Welcome to Sports Quiz!\n\nChoose a sport and difficulty, answer questions, and earn up to 30 coins per correct answer on Hard mode.",
         "reply_markup": {
             "inline_keyboard": [[
                 {"text": "⚽ Play Sports Quiz", "web_app": {"url": PUBLIC_APP_URL}}
