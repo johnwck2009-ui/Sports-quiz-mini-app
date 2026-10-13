@@ -3,11 +3,15 @@ import hmac
 import hashlib
 import json
 import time
+import threading
+import urllib.request
+import urllib.error
 from urllib.parse import parse_qsl
 from flask import Flask, jsonify, request, send_from_directory
 
 app = Flask(__name__, static_folder="static")
 BOT_TOKEN = os.environ.get("BOT_TOKEN", "")
+PUBLIC_APP_URL = "https://sports-quiz-mini-app-production.up.railway.app"
 QUESTION_COUNT = 5
 COINS_PER_CORRECT = 10
 
@@ -45,6 +49,61 @@ QUESTIONS = {
         {"q": "Which country hosts the famous Monaco Grand Prix?", "options": ["France", "Monaco", "Italy", "Spain"], "answer": 1}
     ]
 }
+
+def telegram_api(method, payload=None):
+    """Call Telegram's Bot API without requiring an extra package."""
+    if not BOT_TOKEN:
+        return None
+    body = json.dumps(payload or {}).encode("utf-8")
+    req = urllib.request.Request(
+        f"https://api.telegram.org/bot{BOT_TOKEN}/{method}",
+        data=body,
+        headers={"Content-Type": "application/json"},
+        method="POST",
+    )
+    with urllib.request.urlopen(req, timeout=35) as response:
+        return json.loads(response.read().decode("utf-8"))
+
+def send_start_message(chat_id):
+    telegram_api("sendMessage", {
+        "chat_id": chat_id,
+        "text": "🏆 Welcome to Sports Quiz!\n\nChoose a sport, answer questions, and earn 10 coins for every correct answer.",
+        "reply_markup": {
+            "inline_keyboard": [[
+                {"text": "⚽ Play Sports Quiz", "web_app": {"url": PUBLIC_APP_URL}}
+            ]]
+        }
+    })
+
+def telegram_polling_loop():
+    """Simple single-process polling loop for the Railway prototype."""
+    offset = None
+    try:
+        # Ensure long polling can be used if a webhook was previously configured.
+        telegram_api("deleteWebhook", {"drop_pending_updates": False})
+    except Exception as exc:
+        print(f"Telegram bot setup warning: {exc}", flush=True)
+    while True:
+        try:
+            payload = {"timeout": 25, "allowed_updates": ["message"]}
+            if offset is not None:
+                payload["offset"] = offset
+            result = telegram_api("getUpdates", payload) or {}
+            for update in result.get("result", []):
+                offset = update["update_id"] + 1
+                message = update.get("message", {})
+                text = message.get("text", "")
+                chat = message.get("chat", {})
+                if chat.get("id") and text.split("@", 1)[0].strip() in ("/start", "/start "):
+                    send_start_message(chat["id"])
+        except Exception as exc:
+            print(f"Telegram polling warning: {exc}", flush=True)
+            time.sleep(5)
+
+def start_telegram_bot():
+    if BOT_TOKEN:
+        thread = threading.Thread(target=telegram_polling_loop, daemon=True, name="telegram-bot-polling")
+        thread.start()
 
 def telegram_user_id(init_data):
     """Validate Telegram WebApp initData when BOT_TOKEN is configured."""
@@ -147,6 +206,10 @@ def sports():
         ("football", "Football"), ("basketball", "Basketball"),
         ("tennis", "Tennis"), ("formula1", "Formula 1")
     ]])
+
+# Railway's current Start Command uses one Gunicorn worker, which keeps this
+# prototype's in-memory quiz data and polling loop in a single process.
+start_telegram_bot()
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "10000"))
